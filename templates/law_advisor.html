@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel rounded-3xl p-6 fade-up">
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <h1 class="brand-title text-2xl text-slate-900">Constitutional Law Advisor</h1>
+            <p class="text-sm text-slate-500 mt-1">Get precise article references with professional explanations.</p>
+        </div>
+        <div id="global-loader" class="hidden"><div class="loader"></div></div>
+    </div>
+    <label class="text-sm font-semibold text-slate-700 mt-6 block">Constitutional topic</label>
+    <input id="law-query" class="input w-full mt-3 p-4 rounded-xl" placeholder="Example: freedom of speech, right to privacy, equality before law.">
+    <div class="flex items-center gap-3 mt-4">
+        <button id="law-btn" onclick="Handlers.handleLawAdvisor()" class="btn-accent text-white px-6 py-3 rounded-xl font-semibold">Consult Constitution</button>
+        <span class="text-xs text-slate-500">Precise article references with plain-language guidance</span>
+    </div>
+</section>
+
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    <div class="panel rounded-2xl p-6 bg-slate-50 fade-up stagger-1">
+        <span class="text-xs font-semibold text-slate-500 uppercase">Article</span>
+        <div id="law-article" class="text-3xl font-semibold text-slate-900 mt-2">-</div>
+    </div>
+    <div id="law-explanation" class="panel rounded-2xl p-6 prose max-w-none fade-up stagger-2"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const Handlers = {
+        async handleLawAdvisor() {
+            const query = document.getElementById("law-query").value.trim();
+            if (!query) return UI.notify("Enter a right or topic", "error");
+
+            UI.setLoading("law-btn", true);
+            try {
+                const data = await ApiService.post("/api/lawadvisor", { query });
+                document.getElementById("law-article").innerText = data.article;
+                UI.renderResult("law-explanation", data.explanation);
+            } finally {
+                UI.setLoading("law-btn", false);
+            }
+        }
+    };
+</script>
+{% endblock %}

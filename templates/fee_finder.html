@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel rounded-3xl p-6 fade-up">
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <h1 class="brand-title text-2xl text-slate-900">Lawyer Fee Finder</h1>
+            <p class="text-sm text-slate-500 mt-1">Generate a professional fee estimate for Indian legal matters.</p>
+        </div>
+        <div id="global-loader" class="hidden"><div class="loader"></div></div>
+    </div>
+    <label class="text-sm font-semibold text-slate-700 mt-6 block">Legal matter description</label>
+    <textarea id="fee-query" class="input w-full mt-3 p-4 rounded-xl h-32" placeholder="Example: property dispute in Mumbai, civil suit with potential mediation."></textarea>
+    <div class="flex items-center gap-3 mt-4">
+        <button id="fee-btn" onclick="Handlers.handleFeeFinder()" class="btn-primary text-white px-6 py-3 rounded-xl font-semibold">Generate Estimate</button>
+        <span class="text-xs text-slate-500">Typical response time: under 15 seconds</span>
+    </div>
+</section>
+<section id="fee-result" class="panel rounded-3xl p-6 min-h-[120px] prose max-w-none fade-up stagger-1 mt-6"></section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const Handlers = {
+        async handleFeeFinder() {
+            const query = document.getElementById("fee-query").value.trim();
+            if (!query) return UI.notify("Please describe your matter", "error");
+
+            UI.setLoading("fee-btn", true);
+            try {
+                const data = await ApiService.post("/api/feefinder", { query });
+                UI.renderResult("fee-result", data.response);
+            } finally {
+                UI.setLoading("fee-btn", false);
+            }
+        }
+    };
+</script>
+{% endblock %}

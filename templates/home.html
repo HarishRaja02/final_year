@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="panel rounded-3xl p-8 shine fade-up">
+        <div class="chip">
+            <i class="fas fa-shield-halved text-emerald-600"></i>
+            Confidential by design
+        </div>
+        <h1 class="brand-title text-4xl mt-4">LegalMind Command Center</h1>
+        <p class="text-sm text-slate-500 mt-3">Run a modern legal workflow in one place. Each module opens in a focused workspace designed for professional practice.</p>
+        <div class="mt-6 flex flex-wrap gap-3 text-sm">
+            <a href="/fee-finder" class="btn-dark rounded-2xl px-5 py-3 text-center">Start Fee Finder</a>
+            <a href="/case-predictor" class="btn-ghost rounded-2xl px-5 py-3 text-center">Open Case Predictor</a>
+            <a href="/document-locker" class="btn-ghost rounded-2xl px-5 py-3 text-center">Access Document Locker</a>
+        </div>
+        <div class="mt-8 grid grid-cols-3 gap-3 text-xs">
+            <div class="panel-tight rounded-2xl p-3">
+                <div class="text-slate-500">Avg response</div>
+                <div class="text-lg font-semibold text-slate-900">10s</div>
+            </div>
+            <div class="panel-tight rounded-2xl p-3">
+                <div class="text-slate-500">Modules</div>
+                <div class="text-lg font-semibold text-slate-900">6</div>
+            </div>
+            <div class="panel-tight rounded-2xl p-3">
+                <div class="text-slate-500">Storage</div>
+                <div class="text-lg font-semibold text-slate-900">Local</div>
+            </div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 gap-4">
+        <div class="panel rounded-3xl p-6 fade-up stagger-1">
+            <div class="text-xs uppercase tracking-widest text-slate-500">Highlights</div>
+            <div class="text-2xl font-semibold text-slate-900 mt-2">Precision workflow</div>
+            <p class="text-sm text-slate-500 mt-2">From document handling to case prediction, every step is structured for legal teams.</p>
+            <div class="mt-4 flex flex-wrap gap-2 text-xs">
+                <span class="chip">Secure storage</span>
+                <span class="chip">Automated reminders</span>
+                <span class="chip">AI summaries</span>
+            </div>
+        </div>
+        <div class="panel rounded-3xl p-6 fade-up stagger-2">
+            <div class="text-xs uppercase tracking-widest text-slate-500">System</div>
+            <div class="text-2xl font-semibold text-slate-900 mt-2">Operational</div>
+            <p class="text-sm text-slate-500 mt-2">Email reminders, document storage, and AI services are ready.</p>
+            <div class="mt-4 text-xs text-slate-500">Tip: Keep the app running for reminders to send on time.</div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="panel rounded-3xl p-6 fade-up">
+        <div class="text-xs uppercase tracking-widest text-slate-500">Core Modules</div>
+        <div class="mt-5 space-y-3 text-sm">
+            <a href="/fee-finder" class="flex items-center justify-between bg-white/80 rounded-2xl px-4 py-3">
+                <span>Fee Finder</span>
+                <i class="fas fa-arrow-right text-slate-400"></i>
+            </a>
+            <a href="/law-advisor" class="flex items-center justify-between bg-white/80 rounded-2xl px-4 py-3">
+                <span>Law Advisor</span>
+                <i class="fas fa-arrow-right text-slate-400"></i>
+            </a>
+            <a href="/case-predictor" class="flex items-center justify-between bg-white/80 rounded-2xl px-4 py-3">
+                <span>Case Predictor</span>
+                <i class="fas fa-arrow-right text-slate-400"></i>
+            </a>
+        </div>
+    </div>
+    <div class="panel rounded-3xl p-6 fade-up stagger-1">
+        <div class="text-xs uppercase tracking-widest text-slate-500">Operations</div>
+        <div class="mt-5 space-y-3 text-sm">
+            <a href="/summarizer" class="flex items-center justify-between bg-white/80 rounded-2xl px-4 py-3">
+                <span>Summarizer</span>
+                <i class="fas fa-arrow-right text-slate-400"></i>
+            </a>
+            <a href="/document-locker" class="flex items-center justify-between bg-white/80 rounded-2xl px-4 py-3">
+                <span>Document Locker</span>
+                <i class="fas fa-arrow-right text-slate-400"></i>
+            </a>
+            <a href="/case-reminders" class="flex items-center justify-between bg-white/80 rounded-2xl px-4 py-3">
+                <span>Case Reminders</span>
+                <i class="fas fa-arrow-right text-slate-400"></i>
+            </a>
+        </div>
+    </div>
+    <div class="panel rounded-3xl p-6 fade-up stagger-2">
+        <div class="text-xs uppercase tracking-widest text-slate-500">Client Ready</div>
+        <p class="text-sm text-slate-500 mt-3">Automate status updates, keep documents organized, and generate professional briefs.</p>
+        <div class="mt-5 grid grid-cols-2 gap-3 text-xs">
+            <div class="panel-tight rounded-2xl p-3">Secure PDFs</div>
+            <div class="panel-tight rounded-2xl p-3">Court reminders</div>
+            <div class="panel-tight rounded-2xl p-3">AI summaries</div>
+            <div class="panel-tight rounded-2xl p-3">Outcome scoring</div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="panel rounded-3xl p-6 fade-up">
+        <div class="text-xs uppercase tracking-widest text-slate-500">Why it works</div>
+        <div class="text-2xl font-semibold text-slate-900 mt-2">Structured, auditable outcomes</div>
+        <p class="text-sm text-slate-500 mt-2">Every prediction is supported by retrieved evidence and a structured scoring model.</p>
+    </div>
+    <div class="panel rounded-3xl p-6 fade-up stagger-1">
+        <div class="text-xs uppercase tracking-widest text-slate-500">Trusted workflow</div>
+        <p class="text-sm text-slate-500 mt-2">Keep the app running to deliver reminder emails automatically on court dates.</p>
+        <div class="divider mt-5"></div>
+        <div class="mt-5 text-xs text-slate-500">Gmail SMTP connected via environment credentials.</div>
+    </div>
+    <div class="panel rounded-3xl p-6 fade-up stagger-2">
+        <div class="text-xs uppercase tracking-widest text-slate-500">Professional polish</div>
+        <p class="text-sm text-slate-500 mt-2">Designed to feel enterprise-grade, with clean hierarchy and clear navigation.</p>
+        <div class="mt-4 flex gap-2 text-xs">
+            <span class="chip">Client-ready</span>
+            <span class="chip">Consistent UI</span>
+        </div>
+    </div>
+</section>
+{% endblock %}

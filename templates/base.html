@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegalMind AI | {{ page_title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+    <style>
+        :root {
+            --ink: #0b1220;
+            --navy: #0f172a;
+            --slate: #475569;
+            --gold: #d6b06f;
+            --teal: #0f766e;
+            --mist: #f5f7fb;
+            --card: #ffffff;
+            --ring: rgba(15, 23, 42, 0.08);
+            --sky: #dbeafe;
+            --rose: #fee2e2;
+            --mint: #dcfce7;
+            --amber: #fef3c7;
+        }
+        body {
+            font-family: "Manrope", system-ui, sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 14%, rgba(214, 176, 111, 0.18), transparent 45%),
+                radial-gradient(circle at 90% 12%, rgba(15, 118, 110, 0.16), transparent 45%),
+                radial-gradient(circle at 20% 90%, rgba(30, 58, 138, 0.12), transparent 55%),
+                linear-gradient(180deg, #f8fafc 0%, #f1f4f9 100%);
+        }
+        .brand-title { font-family: "Fraunces", serif; }
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--ring);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+        .panel-tight {
+            background: var(--card);
+            border: 1px solid var(--ring);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+        }
+        .input {
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+        .input:focus {
+            outline: none;
+            border-color: rgba(15, 118, 110, 0.6);
+            box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+            background: #ffffff;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        }
+        .btn-accent {
+            background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+        }
+        .btn-ghost {
+            border: 1px solid rgba(15, 23, 42, 0.14);
+            background: #ffffff;
+        }
+        .btn-dark {
+            background: linear-gradient(135deg, #0b1220 0%, #111827 100%);
+            color: #ffffff;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            border-radius: 999px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            background: rgba(255, 255, 255, 0.75);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            color: #475569;
+        }
+        .loader {
+            border: 2px solid rgba(148, 163, 184, 0.35);
+            border-top: 2px solid var(--gold);
+            border-radius: 50%;
+            width: 1.1rem;
+            height: 1.1rem;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .fade-up { animation: fadeUp 0.8s ease both; }
+        .stagger-1 { animation-delay: 0.08s; }
+        .stagger-2 { animation-delay: 0.16s; }
+        .stagger-3 { animation-delay: 0.24s; }
+        .stagger-4 { animation-delay: 0.32s; }
+        .stagger-5 { animation-delay: 0.4s; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .float {
+            animation: float 8s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine::after {
+            content: "";
+            position: absolute;
+            top: -40%;
+            left: -60%;
+            width: 60%;
+            height: 180%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: rotate(12deg);
+            animation: shine 6s ease-in-out infinite;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-120%) rotate(12deg); }
+            40% { transform: translateX(180%) rotate(12deg); }
+            100% { transform: translateX(180%) rotate(12deg); }
+        }
+        .prose :where(h1, h2, h3) { color: #0f172a; }
+        .prose :where(ul) { list-style: disc; padding-left: 1.2rem; }
+        .nav-link {
+            color: #475569;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        .nav-link:hover {
+            color: #0f172a;
+        }
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(15,23,42,0.14), transparent);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <header class="glass border-b border-white/60">
+        <div class="max-w-6xl mx-auto px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <a href="/" class="flex items-center gap-3">
+                <div class="h-11 w-11 rounded-2xl bg-white flex items-center justify-center shadow-sm">
+                    <i class="fas fa-scale-balanced text-lg text-slate-800"></i>
+                </div>
+                <div>
+                    <div class="brand-title text-lg text-slate-900">LegalMind AI</div>
+                    <div class="text-xs text-slate-500">Professional Legal Intelligence</div>
+                </div>
+            </a>
+            <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-2 bg-white px-4 py-2 rounded-full text-xs text-slate-600 shadow-sm">
+                    <i class="fas fa-circle-check text-emerald-600"></i>
+                    System healthy
+                </div>
+                <nav class="hidden lg:flex items-center gap-4">
+                    <a class="nav-link" href="/fee-finder">Fee Finder</a>
+                    <a class="nav-link" href="/law-advisor">Law Advisor</a>
+                    <a class="nav-link" href="/case-predictor">Case Predictor</a>
+                    <a class="nav-link" href="/summarizer">Summarizer</a>
+                </nav>
+                <a href="/" class="btn-ghost text-xs px-4 py-2 rounded-full">Home</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-10">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="mt-10 border-t border-white/70 bg-white/60">
+        <div class="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-500">
+            <div>
+                <div class="brand-title text-lg text-slate-900">LegalMind AI</div>
+                <p class="mt-2">Professional legal intelligence for modern practices.</p>
+            </div>
+            <div>
+                <div class="text-xs uppercase tracking-widest text-slate-400">Features</div>
+                <div class="mt-3 space-y-2">
+                    <a class="nav-link block" href="/document-locker">Document Locker</a>
+                    <a class="nav-link block" href="/case-reminders">Case Reminders</a>
+                    <a class="nav-link block" href="/summarizer">Summarizer</a>
+                </div>
+            </div>
+            <div>
+                <div class="text-xs uppercase tracking-widest text-slate-400">Compliance</div>
+                <p class="mt-3">AI outputs are advisory only. Keep the app running for scheduled reminders.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast-container" class="fixed bottom-8 right-8 space-y-4 z-[100]"></div>
+
+    <script>
+        const ApiService = {
+            async post(endpoint, body, isFile = false) {
+                const options = { method: "POST" };
+                if (isFile) {
+                    options.body = body;
+                } else {
+                    options.headers = { "Content-Type": "application/json" };
+                    options.body = JSON.stringify(body);
+                }
+
+                try {
+                    const response = await fetch(endpoint, options);
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
+                    return result;
+                } catch (error) {
+                    UI.notify(error.message, "error");
+                    throw error;
+                }
+            },
+            async get(endpoint) {
+                try {
+                    const response = await fetch(endpoint);
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
+                    return result;
+                } catch (error) {
+                    UI.notify(error.message, "error");
+                    throw error;
+                }
+            },
+            async del(endpoint) {
+                try {
+                    const response = await fetch(endpoint, { method: "DELETE" });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || `HTTP error! status: ${response.status}`);
+                    return result;
+                } catch (error) {
+                    UI.notify(error.message, "error");
+                    throw error;
+                }
+            }
+        };
+
+        const UI = {
+            renderResult(containerId, markdown) {
+                const container = document.getElementById(containerId);
+                const html = marked.parse(markdown || "");
+                container.innerHTML = DOMPurify.sanitize(html);
+                container.scrollIntoView({ behavior: "smooth", block: "start" });
+            },
+            setLoading(btnId, isLoading) {
+                const btn = document.getElementById(btnId);
+                const loader = document.getElementById("global-loader");
+                if (btn) {
+                    btn.disabled = isLoading;
+                    btn.style.opacity = isLoading ? "0.6" : "1";
+                }
+                if (loader) {
+                    isLoading ? loader.classList.remove("hidden") : loader.classList.add("hidden");
+                }
+            },
+            notify(msg, type) {
+                const container = document.getElementById("toast-container");
+                const toast = document.createElement("div");
+                toast.className = `toast p-4 rounded-xl text-white shadow-xl ${type === "error" ? "bg-red-600" : "bg-emerald-600"}`;
+                toast.innerText = msg;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
+        };
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

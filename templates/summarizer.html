@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel rounded-3xl p-8 text-center fade-up">
+    <h1 class="brand-title text-2xl text-slate-900">Legal Document Summarizer</h1>
+    <p class="text-sm text-slate-500 mt-1">Condense long PDFs into accurate, executive-ready summaries.</p>
+    <div id="global-loader" class="hidden mt-4"><div class="loader mx-auto"></div></div>
+    <input type="file" id="summarize-file" class="hidden" accept="application/pdf">
+    <label for="summarize-file" class="cursor-pointer border-2 border-dashed border-slate-200 p-10 rounded-2xl block hover:bg-slate-50 transition mt-6">
+        <i class="fas fa-file-pdf text-4xl text-slate-700 mb-4"></i>
+        <p class="text-slate-600 font-medium">Click to select a PDF for summarization</p>
+        <p class="text-xs text-slate-400 mt-2">Max file size depends on server configuration</p>
+    </label>
+    <button id="summarize-btn" onclick="Handlers.handleSummarize()" class="btn-primary text-white mt-6 px-10 py-3 rounded-full font-semibold">Generate Summary</button>
+</section>
+
+<section id="summarize-result" class="panel rounded-3xl p-6 prose max-w-none fade-up stagger-1 mt-6"></section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const Handlers = {
+        async handleSummarize() {
+            const file = document.getElementById("summarize-file").files[0];
+            if (!file || file.type !== "application/pdf") return UI.notify("Please select a PDF", "error");
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            UI.setLoading("summarize-btn", true);
+            try {
+                const data = await ApiService.post("/api/summarize", formData, true);
+                UI.renderResult("summarize-result", data.summary);
+            } finally {
+                UI.setLoading("summarize-btn", false);
+            }
+        }
+    };
+</script>
+{% endblock %}

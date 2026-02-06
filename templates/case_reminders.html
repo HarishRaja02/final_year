@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="panel rounded-3xl p-6 fade-up">
+    <div class="flex items-center justify-between gap-4">
+        <div>
+            <h1 class="brand-title text-2xl text-slate-900">Court Case Reminders</h1>
+            <p class="text-sm text-slate-500 mt-1">Schedule automated email reminders for court dates.</p>
+        </div>
+        <div id="global-loader" class="hidden"><div class="loader"></div></div>
+    </div>
+    <label class="text-sm font-semibold text-slate-700 mt-6 block">Schedule a reminder</label>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        <input id="reminder-email" type="email" class="input w-full p-4 rounded-xl" placeholder="Client email address">
+        <input id="reminder-title" type="text" class="input w-full p-4 rounded-xl" placeholder="Case title">
+        <input id="reminder-date" type="date" class="input w-full p-4 rounded-xl">
+        <input id="reminder-time" type="time" class="input w-full p-4 rounded-xl" value="09:00">
+    </div>
+    <textarea id="reminder-note" class="input w-full mt-4 p-4 rounded-xl h-24" placeholder="Optional note for the client"></textarea>
+    <div class="flex items-center gap-3 mt-4">
+        <button id="reminder-btn" onclick="Handlers.handleReminderCreate()" class="btn-accent text-white px-6 py-3 rounded-xl font-semibold">Schedule Reminder</button>
+        <span class="text-xs text-slate-500">Email will be sent at the selected time on the case day</span>
+    </div>
+</section>
+
+<section class="panel rounded-3xl p-6 fade-up stagger-1 mt-6">
+    <div class="flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-slate-800">Upcoming Reminders</h3>
+        <button onclick="Handlers.refreshReminders()" class="text-xs text-slate-500 hover:text-slate-900">Refresh</button>
+    </div>
+    <div id="reminder-list" class="mt-4 space-y-3 text-sm text-slate-600"></div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const Handlers = {
+        async handleReminderCreate() {
+            const email = document.getElementById("reminder-email").value.trim();
+            const caseTitle = document.getElementById("reminder-title").value.trim();
+            const courtDate = document.getElementById("reminder-date").value;
+            const reminderTime = document.getElementById("reminder-time").value;
+            const note = document.getElementById("reminder-note").value.trim();
+
+            if (!email || !caseTitle || !courtDate || !reminderTime) {
+                return UI.notify("Please fill all required fields", "error");
+            }
+
+            UI.setLoading("reminder-btn", true);
+            try {
+                await ApiService.post("/api/reminders", {
+                    email,
+                    case_title: caseTitle,
+                    court_date: courtDate,
+                    reminder_time: reminderTime,
+                    note
+                });
+                UI.notify("Reminder scheduled", "success");
+                await Handlers.refreshReminders();
+            } finally {
+                UI.setLoading("reminder-btn", false);
+            }
+        },
+
+        async refreshReminders() {
+            const list = document.getElementById("reminder-list");
+            list.innerHTML = "Loading reminders...";
+            const data = await ApiService.get("/api/reminders");
+            if (!data.reminders.length) {
+                list.innerHTML = "No reminders scheduled.";
+                return;
+            }
+            list.innerHTML = data.reminders.map(item => {
+                const status = item.sent_at ? "Sent" : "Scheduled";
+                return `
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2 border border-slate-200 rounded-xl p-3">
+                        <div>
+                            <div class="font-semibold text-slate-800">${item.case_title}</div>
+                            <div class="text-xs text-slate-500">${item.email} • Court date ${item.court_date} • Reminder ${item.reminder_date}</div>
+                            <div class="text-xs text-slate-400">Status: ${status}</div>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs">
+                            <button class="text-red-600 hover:underline" onclick="Handlers.deleteReminder('${item.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        },
+
+        async deleteReminder(reminderId) {
+            await ApiService.del(`/api/reminders/${reminderId}`);
+            UI.notify("Reminder deleted", "success");
+            await Handlers.refreshReminders();
+        }
+    };
+
+    Handlers.refreshReminders();
+</script>
+{% endblock %}
