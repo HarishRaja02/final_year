@@ -59,12 +59,22 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-# Storage paths
+# Storage paths (serverless-safe)
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
-DOCS_DIR = BASE_DIR / "storage" / "documents"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-DOCS_DIR.mkdir(parents=True, exist_ok=True)
+DEFAULT_DATA_DIR = BASE_DIR / "data"
+DEFAULT_DOCS_DIR = BASE_DIR / "storage" / "documents"
+
+def resolve_writable_dir(preferred: Path, fallback: Path) -> Path:
+    try:
+        preferred.mkdir(parents=True, exist_ok=True)
+        return preferred
+    except Exception:
+        fallback.mkdir(parents=True, exist_ok=True)
+        return fallback
+
+TMP_BASE = Path(os.getenv("TMPDIR", "/tmp")) / "legalmind"
+DATA_DIR = resolve_writable_dir(Path(os.getenv("APP_DATA_DIR", DEFAULT_DATA_DIR)), TMP_BASE / "data")
+DOCS_DIR = resolve_writable_dir(Path(os.getenv("APP_DOCS_DIR", DEFAULT_DOCS_DIR)), TMP_BASE / "documents")
 DB_PATH = DATA_DIR / "legalmind.db"
 
 # Environment Variables Validation
