@@ -17,11 +17,25 @@ from dotenv import load_dotenv
 from groq import Groq
 import fitz  # PyMuPDF
 from PyPDF2 import PdfReader
-try:
-    # LangChain >=0.1.0 splitters moved to langchain_text_splitters
-    from langchain_text_splitters import RecursiveCharacterTextSplitter
-except Exception:  # pragma: no cover - fallback for older installs
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
+TEXT_SPLITTER_AVAILABLE = True
+_RecursiveCharacterTextSplitter = None
+
+def get_text_splitter():
+    global _RecursiveCharacterTextSplitter, TEXT_SPLITTER_AVAILABLE
+    if _RecursiveCharacterTextSplitter is not None:
+        return _RecursiveCharacterTextSplitter
+    try:
+        from langchain_text_splitters import RecursiveCharacterTextSplitter
+        _RecursiveCharacterTextSplitter = RecursiveCharacterTextSplitter
+        return _RecursiveCharacterTextSplitter
+    except Exception:
+        try:
+            from langchain.text_splitter import RecursiveCharacterTextSplitter
+            _RecursiveCharacterTextSplitter = RecursiveCharacterTextSplitter
+            return _RecursiveCharacterTextSplitter
+        except Exception:
+            TEXT_SPLITTER_AVAILABLE = False
+            return None
 RAG_LIBS_AVAILABLE = True
 try:
     from langchain_huggingface import HuggingFaceEmbeddings
@@ -420,7 +434,8 @@ def summarize_pdf():
 def index_case():
     """Chunks and embeds PDF case files into the FAISS vector store."""
     global vector_db
-    if not RAG_LIBS_AVAILABLE:
+    splitter_cls = get_text_splitter()
+    if not RAG_LIBS_AVAILABLE or splitter_cls is None:
         return jsonify({
             "error": "RAG dependencies not installed. Install full requirements to enable case indexing."
         }), 503
@@ -446,7 +461,7 @@ def index_case():
                 "error": "Embeddings not available. Install full requirements to enable case indexing."
             }), 503
 
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        text_splitter = splitter_cls(chunk_size=1000, chunk_overlap=200)
         chunks = text_splitter.split_text(text)
 
         with vector_db_lock:
