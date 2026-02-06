@@ -22,8 +22,12 @@ try:
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 except Exception:  # pragma: no cover - fallback for older installs
     from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import FAISS
+RAG_LIBS_AVAILABLE = True
+try:
+    from langchain_huggingface import HuggingFaceEmbeddings
+    from langchain_community.vectorstores import FAISS
+except Exception:
+    RAG_LIBS_AVAILABLE = False
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException
 
@@ -58,16 +62,24 @@ if not GROQ_API_KEY:
 # Global Resource Initialization
 try:
     groq_client = Groq(api_key=GROQ_API_KEY)
-    # Load embeddings once globally (heavy resource)
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    logger.info("Global AI resources initialized successfully.")
+    logger.info("Groq client initialized successfully.")
 except Exception as e:
-    logger.error(f"Failed to initialize AI resources: {e}")
+    logger.error(f"Failed to initialize Groq client: {e}")
     raise
+
+_embeddings = None
+def get_embeddings():
+    global _embeddings
+    if _embeddings is not None:
+        return _embeddings
+    if not RAG_LIBS_AVAILABLE:
+        return None
+    _embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    return _embeddings
 
 # Thread-safe Vector DB Storage
 vector_db_lock = threading.Lock()
-vector_db: Optional[FAISS] = None
+vector_db: Optional["FAISS"] = None
 GROQ_MODEL = "llama-3.1-8b-instant"
 
 # Email settings (Gmail SMTP)
@@ -165,6 +177,9 @@ def extract_structured_case(query: str) -> dict:
 
 def compute_precedent_similarity(query: str, docs: list) -> float:
     try:
+        embeddings = get_embeddings()
+        if embeddings is None:
+            return 0.0
         query_vec = embeddings.embed_query(query)
         doc_texts = [doc.page_content[:2000] for doc in docs]
         doc_vecs = embeddings.embed_documents(doc_texts)
@@ -405,6 +420,11 @@ def summarize_pdf():
 def index_case():
     """Chunks and embeds PDF case files into the FAISS vector store."""
     global vector_db
+    if not RAG_LIBS_AVAILABLE:
+        return jsonify({
+            "error": "RAG dependencies not installed. Install full requirements to enable case indexing."
+        }), 503
+
     if 'file' not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
@@ -420,6 +440,12 @@ def index_case():
             return jsonify({"error": "Failed to extract text for indexing"}), 422
 
         # RAG Optimization: Overlapping chunks for context preservation
+        embeddings = get_embeddings()
+        if embeddings is None:
+            return jsonify({
+                "error": "Embeddings not available. Install full requirements to enable case indexing."
+            }), 503
+
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         chunks = text_splitter.split_text(text)
 
@@ -435,6 +461,11 @@ def index_case():
 @app.route('/api/predict', methods=['POST'])
 def predict_case():
     """Predicts case outcome using RAG and a specialized legal analyst prompt."""
+    if not RAG_LIBS_AVAILABLE:
+        return jsonify({
+            "error": "RAG dependencies not installed. Install full requirements to enable case prediction."
+        }), 503
+
     if vector_db is None:
         return jsonify({"error": "No case document has been indexed yet. Please upload a PDF first."}), 412
     
